@@ -1,3 +1,5 @@
-*.csv
-*.xlsx
+/csv
+/txt
+/htm
+/merged
 /_archive

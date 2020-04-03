@@ -2,6 +2,7 @@ import pandas as pd
 from glob import iglob
 from pathlib import Path
 
+path = r'T:\Ascential Events\WARC\Backup Server\Loading\Monthly content for Newgen\Project content - March 2020\WARC Awards 2020'#input('paste folder path: ') # logger.info('user input: ' + path)
 
 def main():
 	'''
@@ -11,7 +12,7 @@ def main():
 	'''
 	
 	# user input path to metadata xlsx file
-	path = r'T:\Ascential Events\WARC\Backup Server\Loading\Monthly content for Newgen\Project content - March 2020\WARC Awards 2020'#input('paste folder path: ') # logger.info('user input: ' + path)
+	
 
 	# filter only xlsx files matching shortlist metadata in the filename
 	files = iglob(fr'{path}\\*hortlist*metadata*.xlsx')
