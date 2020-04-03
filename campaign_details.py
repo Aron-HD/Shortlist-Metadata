@@ -49,7 +49,7 @@ def metadata(csvfn, dupes):
 						template = f"""\
 <html>
 <body>
-<!--StartofArticle {ID}-->
+<!-- {ID} Campaign Details -->
 <h3>Campaign details</h3>
 <p><strong>Brand:</strong> {Brand}<br/>
 <strong>Brand owner:</strong> {Owner}<br/>

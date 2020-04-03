@@ -1,44 +1,70 @@
-import csv
-import os
+import pandas as pd
+import csv # convert csv section to pandas
 from shutil import copyfileobj
 from pathlib import Path
+from glob import iglob
+from campaign_details import path
 
 """This script successfully merges .htm and .txt files, adding campaign details templates to each ID.
 Current problem is that it creates a new .htm file when only the .txt campaign details are present.
 missing .htm files are usually due to there being dupes."""
 
-def main():
+def merge(file, dupes):
 
 	dirName = f'merged'
 
-	if not os.path.exists(dirName): # change to pathlib
-	   os.makedirs(dirName)    
+	if not Path(dirName).is_dir(): 
+		dirName.mkdir()
+	
+	num = 0
+	dup = 0
 
-	with open ('raw_metadata.csv', 'r') as df:
+	# convert csv section to pandas
+	with open (file) as df:
 		csv_data = csv.DictReader(df)
 
-		num = 0
-		
 		for line in csv_data:
 			ID = line['ID']
-			head, tail = ID.split('.')
-			ID = head
-			firstfile = Path(rf'C:\Users\arondavidson\Desktop\Testing Scripts\Scripts\Metadata\txt\\{ID}.txt') 
-			secondfile = Path(rf'C:\Users\arondavidson\Desktop\Testing Scripts\Scripts\Metadata\htm\\{ID}.htm')
 
-			fn = fr'{dirName}\\{ID}.htm'
-			with open(fn, "wb") as wfd:
-				for f in [firstfile, secondfile]:
-					try: 
-						with open(f, "rb") as fd:
-							copyfileobj(fd, wfd, 1024 * 1024 * 10) 
-							num += 0.5
-					except FileNotFoundError:
-						print(f"\tx '{ID}.htm' not found - x (likely a dupe)")
-						num -= 0.5
+			if not ID in dupes:
+				firstfile = Path(rf'C:\Users\arondavidson\Desktop\Testing Scripts\Scripts\Metadata\txt\\{ID}.txt') 
+				secondfile = Path(rf'C:\Users\arondavidson\Desktop\Testing Scripts\Scripts\Metadata\htm\\{ID}.htm')
+
+				fn = fr'{dirName}\\{ID}.htm'
+				with open(fn, "wb") as wfd:
+					for f in [firstfile, secondfile]:
+						try: 
+							with open(f, "rb") as fd:
+								copyfileobj(fd, wfd, 1024 * 1024 * 10)
+							
+						except FileNotFoundError:
+							print(f"\tx '{ID}.htm' not found - x (likely a dupe)")
+					print(fn.split('\\')[-1])
+				num += 1
+
+			else:
+				dup += 1		
+
+	print(f'\n- {num} files... [{dup} dupes] ')
 
 
-	print(f'\n- {num} files created...')
+def main():
+
+	f = fr'{path}\\WARC Awards_EDIT.xlsx'
+	df = pd.read_excel(f, sheet_name='Dupes')
+	dupes = df['ID'].tolist()
+
+	# categories to loop through (change to pandas and read tabs from shortlist metadata.xlsx instead of csv files)
+	for csvfn in ['Innovation', 'Purpose']: # 'Content', 'Social'
+		try:
+			for file in iglob(fr'csv\\{csvfn}*.csv'):
+				print(f'\nread: {file}')
+				merge(file, dupes)
+				
+		except Exception as e:
+			print(e)
+
+	print(f'\n### END ###\n')
 
 if __name__ == '__main__':
 	main()
