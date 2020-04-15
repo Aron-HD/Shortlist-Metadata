@@ -4,17 +4,15 @@ from shutil import copyfileobj
 from pathlib import Path
 from glob import iglob
 from campaign_details import path
+# import re
 
 """This script successfully merges .htm and .txt files, adding campaign details templates to each ID.
 Current problem is that it creates a new .htm file when only the .txt campaign details are present.
 missing .htm files are usually due to there being dupes."""
 
+dirName = f'merged'
+
 def merge(file, dupes):
-
-	dirName = f'merged'
-
-	if not Path(dirName).is_dir(): 
-		dirName.mkdir()
 	
 	num = 0
 	dup = 0
@@ -26,9 +24,29 @@ def merge(file, dupes):
 		for line in csv_data:
 			ID = line['ID']
 
-			if not ID in dupes:
+			if not int(ID) in dupes:
 				firstfile = Path(rf'C:\Users\arondavidson\Desktop\Testing Scripts\Scripts\Metadata\txt\\{ID}.txt') 
 				secondfile = Path(rf'C:\Users\arondavidson\Desktop\Testing Scripts\Scripts\Metadata\htm\\{ID}.htm')
+				# tidy htm
+				
+				with open(secondfile, 'r') as f:
+					contents = f.read()
+					try:
+						# can't get regex to work
+						# search = re.findall(r'<sup>\d*</sup>[\.\^\$\*\+\?\[\]\{\}\(\)\-@#~/"\':;=£%&!]', contents)
+						# print(ID, search)
+						# for old in search:
+						# 	head = old[:-1]
+						# 	tail = old[-1]
+						# 	new =f'{tail}{head}'
+						# 	# print(new)
+						out = contents.replace('<html>', '\n').replace('<body>', '')
+						with open(secondfile, 'w') as f:
+							f.write(out)
+						print('tidied ' + str(ID))
+
+					except Exception as e:
+						print(e)
 
 				fn = fr'{dirName}\\{ID}.htm'
 				with open(fn, "wb") as wfd:
@@ -43,19 +61,21 @@ def merge(file, dupes):
 				num += 1
 
 			else:
-				dup += 1		
+				dup += 1
 
 	print(f'\n- {num} files... [{dup} dupes] ')
 
-
 def main():
+
+	if not Path(dirName).is_dir(): 
+		dirName.mkdir()
 
 	f = fr'{path}\\WARC Awards_EDIT.xlsx'
 	df = pd.read_excel(f, sheet_name='Dupes')
 	dupes = df['ID'].tolist()
 
 	# categories to loop through (change to pandas and read tabs from shortlist metadata.xlsx instead of csv files)
-	for csvfn in ['Innovation', 'Purpose']: # 'Content', 'Social'
+	for csvfn in ['Content', 'Social']: # 'Innovation', 'Purpose'
 		try:
 			for file in iglob(fr'csv\\{csvfn}*.csv'):
 				print(f'\nread: {file}')
@@ -68,3 +88,4 @@ def main():
 
 if __name__ == '__main__':
 	main()
+	# tidy htm

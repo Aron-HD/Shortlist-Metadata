@@ -16,7 +16,7 @@ def metadata(csvfn, dupes):
 
 	Though this won't be necessary if newgen are asked not to include the template.
 	"""
-
+	
 	if not Path(dirName).is_dir(): 
 		dirName.mkdir() # logger.info("")
 
@@ -29,8 +29,8 @@ def metadata(csvfn, dupes):
 			csv_data = csv.DictReader(df)
 			
 			for line in csv_data:
-				ID_ext = line['ID']
-				ID = int(ID_ext) #ID_ext.split('.')[0] # so it's not a float
+				
+				ID = line['ID']
 				Brand = line['Brand']
 				Owner = line['Brand Owner Name']
 				Lead_agency = line['Lead agencies']
@@ -40,12 +40,10 @@ def metadata(csvfn, dupes):
 				Media_channels = line['Media used']
 				Budget = line['Budget']
 
-				fn = fr'{dirName}\\{ID}.txt'
-
-				# write a txt files with details if not a dupe
-				if not ID in dupes:
-					with open (fn, 'w') as f:
-							
+				# write a txt file with details if not a dupe
+				if not int(ID) in dupes:
+					fn = fr'{dirName}\\{ID}.txt'		
+					with open (fn, 'w', encoding='1252') as f:
 						template = f"""\
 <html>
 <body>
@@ -76,29 +74,30 @@ def metadata(csvfn, dupes):
 <strong>Industries:</strong> {Industries}<br/>
 <strong>Media channels:</strong> {Media_channels}<br/>
 <strong>Budget:</strong> {Budget}</p>"""
-				
+
 						f.write(template)
+						number += 1
 						
 						print(f"- created '{ID}.txt'")
+				else:
+					print(f"- x dupe '{ID}'")
 
-						number += 1
-
-	print(f"- {number} sets of campaign details created in '{dirName}'")
+		print(f"- {number} sets of campaign details created in '{dirName}'")
 
 def pre_post_script():
 	files_in_dirName = len(glob(dirName + '\\*.txt'))
-	print(f"\n#			Pre-script: {files_in_dirName} txt files in 'txt_files' folder")
+	return f"- {files_in_dirName} txt files in 'txt_files' folder"
 
 def main():
 	
-	pre_post_script()
+	print('			# PRE-SCRIPT: ' + pre_post_script())
 
 	# find 'Dupes' tab in main EDIT spreadsheet and save all IDs in tab to a list to check against
 	df = pd.read_excel(f'{path}\\WARC Awards_EDIT.xlsx', sheet_name='Dupes')
 	dupes = df['ID'].tolist()
 
 	# categories to loop through (change to pandas and read tabs from shortlist metadata.xlsx instead of csv files)
-	for csvfn in ['Innovation', 'Purpose']: # 'Content', 'Social'
+	for csvfn in ['Content', 'Social']: #  'Innovation', 'Purpose'
 		metadata(csvfn, dupes)
 
 	print(f"""
@@ -117,9 +116,11 @@ def main():
 #
 #	- add logging and try, except to catch errors.
 #
+
+###############################################################
 """)
 
-	pre_post_script()
+	print('			# POST-SCRIPT: ' + pre_post_script())
 
 if __name__ == '__main__':
 	main()
