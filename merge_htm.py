@@ -25,8 +25,8 @@ def merge(file, dupes):
 			ID = line['ID']
 
 			if not int(ID) in dupes:
-				firstfile = Path(rf'C:\Users\arondavidson\Desktop\Testing Scripts\Scripts\Metadata\txt\\{ID}.txt') 
-				secondfile = Path(rf'C:\Users\arondavidson\Desktop\Testing Scripts\Scripts\Metadata\htm\\{ID}.htm')
+				firstfile = Path(rf'txt/{ID}.txt') 
+				secondfile = Path(rf'htm/{ID}.htm')
 				# tidy htm
 				
 				with open(secondfile, 'r') as f:
@@ -70,14 +70,14 @@ def main():
 	if not Path(dirName).is_dir(): 
 		dirName.mkdir()
 
-	f = fr'{path}\\WARC Awards_EDIT.xlsx'
+	f = fr'{path}/*EDIT.xlsx'
 	df = pd.read_excel(f, sheet_name='Dupes')
 	dupes = df['ID'].tolist()
 
 	# categories to loop through (change to pandas and read tabs from shortlist metadata.xlsx instead of csv files)
-	for csvfn in ['Content', 'Social']: # 'Innovation', 'Purpose'
+	for csvfn in ['Entrants']: # 'Innovation', 'Purpose'
 		try:
-			for file in iglob(fr'csv\\{csvfn}*.csv'):
+			for file in iglob(fr'csv/*{csvfn}*.csv'):
 				print(f'\nread: {file}')
 				merge(file, dupes)
 				
