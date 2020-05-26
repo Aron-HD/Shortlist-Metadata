@@ -2,8 +2,8 @@ import pandas as pd
 import csv # convert csv section to pandas
 from shutil import copyfileobj
 from pathlib import Path
-from glob import iglob
-from campaign_details import path
+from glob import glob
+# from campaign_details import path
 # import re
 
 """This script successfully merges .htm and .txt files, adding campaign details templates to each ID.
@@ -12,7 +12,7 @@ missing .htm files are usually due to there being dupes."""
 
 dirName = f'merged'
 
-def merge(file, dupes):
+def merge(file, dupes, murkies):
 	
 	num = 0
 	dup = 0
@@ -24,7 +24,8 @@ def merge(file, dupes):
 		for line in csv_data:
 			ID = line['ID']
 
-			if not int(ID) in dupes:
+			if not int(ID) in dupes and not int(ID) in murkies:
+
 				firstfile = Path(rf'txt/{ID}.txt') 
 				secondfile = Path(rf'htm/{ID}.htm')
 				# tidy htm
@@ -66,20 +67,23 @@ def merge(file, dupes):
 	print(f'\n- {num} files... [{dup} dupes] ')
 
 def main():
+	path = r'T:\Ascential Events\WARC\Backup Server\Loading\Monthly content for Newgen\Project content - March 2020\WARC Awards 2020'
 
 	if not Path(dirName).is_dir(): 
 		dirName.mkdir()
 
-	f = fr'{path}/*EDIT.xlsx'
+	f = glob(fr'{path}\*EDIT.xlsx')[0]
 	df = pd.read_excel(f, sheet_name='Dupes')
 	dupes = df['ID'].tolist()
+	df = pd.read_excel(f, sheet_name='Murkies')
+	murkies = df['ID'].tolist()
 
 	# categories to loop through (change to pandas and read tabs from shortlist metadata.xlsx instead of csv files)
 	for csvfn in ['Entrants']: # 'Innovation', 'Purpose'
 		try:
-			for file in iglob(fr'csv/*{csvfn}*.csv'):
+			for file in glob(fr'csv/*{csvfn}*.csv'):
 				print(f'\nread: {file}')
-				merge(file, dupes)
+				merge(file, dupes, murkies)
 				
 		except Exception as e:
 			print(e)
