@@ -54,8 +54,14 @@ def campaign_details(dirName, path, dupes, excel_file, sheets):
 						template += f"""
 <strong>Market:</strong> {Market}<br/>
 <strong>Industries:</strong> {Industries}<br/>
-<strong>Media channels:</strong> {Media_channels}<br/>
-<strong>Budget:</strong> {Budget}</p>"""
+<strong>Media channels:</strong> {Media_channels}<br/>"""
+
+						if 'onfidential' in Budget:
+							pass
+						elif Budget == '0k':
+							template += f"\n<strong>Budget:</strong> No budget</p>"
+						else:
+							template += f"\n<strong>Budget:</strong> {Budget}</p>"
 
 						f.write(template)
 						number += 1
