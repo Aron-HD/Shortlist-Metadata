@@ -15,12 +15,12 @@ def campaign_details(dirName, path, dupes, excel_file, sheets):
 			for index, row in df.iterrows():
 				ID = row['ID']
 				Brand = row['Brand']
-				Owner = row['Brand Owner Name']
+				Owner = row['Brand owner']
 				Lead_agency = row['Lead agencies']
 				Contributing_agency = str(row['Contributing agencies'])
-				Market = row['Countries']
+				Market = row['Market']
 				Industries = row['Industry sector']
-				Media_channels = row['Media used']
+				Media_channels = row['Media channels']
 				Budget = row['Budget']
 				# write a txt file with details if not a dupe
 				if not ID in dupes:
@@ -97,9 +97,12 @@ def get_sheets(dirName, path, dupes, excel_file):
 def get_dupes(path):
 	files = Path(path).glob(r'*EDIT.xlsx')
 	for file in files:
-		df = pd.read_excel(file, sheet_name='Dupes')
-		dupes = df['ID'].tolist()
-		print(len(dupes), 'Dupes:', dupes)
+		try:
+			df = pd.read_excel(file, sheet_name='Dupes')
+			dupes = df['ID'].tolist()
+			print(len(dupes), 'Dupes:', dupes)
+		except Exception as e:
+			raise e
 	return dupes
 
 def pre_post_script(dirName):
