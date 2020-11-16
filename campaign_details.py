@@ -79,7 +79,7 @@ def merge(excel_file, mergedir, dupes, murkies, sheets):
 	for file in excel_file:
 		for sheet in sheets:
 			df = pd.read_excel(file, sheet_name=sheet)
-			IDs = df['ID'].tolist()
+			IDs = df['ID'].astype(int).tolist()
 
 	for ID in IDs:
 
